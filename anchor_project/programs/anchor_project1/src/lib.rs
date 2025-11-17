@@ -6,7 +6,7 @@ mod events;
 mod instructions;
 mod state;
 use instructions::*;
-declare_id!("Hi7PtFd6gyNVt7VWRHELpqU1FnaRG7sGu5S34WaJdFyJ");
+declare_id!("uQFxxGURSSagfwpeEx8DQT1yLbLiqfuMAqLsjWYKbJA");
 
 #[program]
 pub mod anchor_project {
