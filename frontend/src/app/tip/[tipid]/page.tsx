@@ -1,0 +1,75 @@
+"use client";
+import LatestTxns from "@/src/components/LatestTxns";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { formatAddress } from "@/src/lib/utils";
+import { DM_Sans } from "next/font/google";
+import { useParams } from "next/navigation";
+import React from "react";
+
+const dmsans = DM_Sans({
+  subsets: ["latin"],
+});
+
+const page = () => {
+  const { tipid } = useParams();
+  console.log("Tip Id ", tipid);
+
+  const builderAddForTip = tipid as string;
+
+  const handleTipWallet = () => {
+    console.log("Handling tipping wallet");
+  };
+  return (
+    <>
+      <div
+        className={`text-black  flex items-start justify-between ${dmsans.className} mt-20 `}
+      >
+        <div>
+          <p
+            className="text-2xl md:text-[2.7rem]  font-semibold "
+            style={{ fontFamily: "cursive" }}
+          >
+            Hey tipper (1Z..0Y), <br />
+            Your support makes it easier <br />
+            to bring good things to the world.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <p>
+            Address :{" "}
+            <span className="font-semibold">
+              {" "}
+              {formatAddress(builderAddForTip)}{" "}
+            </span>{" "}
+          </p>
+          <p>Total tips : 10 SOL </p>
+        </div>
+      </div>
+
+      <div className="flex items-center mx-auto justify-center flex-col h-[45vh] gap-5">
+        <Input
+          type="number"
+          placeholder="0.001 SOL"
+          className="text-blue-950  max-w-28"
+        />
+        <Button
+          variant={"secondary"}
+          className="bg-[#522AA5] hover:bg-[#5128a5d9] text-white font-semibold cursor-pointer"
+          onClick={handleTipWallet}
+        >
+          {" "}
+          Tip
+        </Button>
+      </div>
+
+      <div className="bg-zinc-50 h-full w-full">
+        <h2 className="text-indigo-950">Latest Transactions:</h2>
+        <LatestTxns />
+      </div>
+    </>
+  );
+};
+
+export default page;
