@@ -1,15 +1,71 @@
+"use client";
 import Image from "next/image";
 import Navbar from "../components/header/Navbar";
 import HeroSection from "../components/HeroSection";
+import LatestTxns from "../components/LatestTxns";
+import { getAllVaultAccount } from "../lib/anchor/services";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { getConnection } from "../lib/solana/connection";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [vaultAccounts, setVaultAccounts] = useState<
+    { pdaAddress: string; creator: string; totalTips: number }[]
+  >([]);
+  const wallet = useAnchorWallet();
+  const conn = getConnection();
+
+  async function fetchAllAccounts() {
+    if (!wallet) return;
+    const acc = await getAllVaultAccount(wallet, conn);
+    console.log({ acc });
+
+    // const accs = {
+    //   pdaAddress: acc[0].publicKey.toString(),
+    //   creator: acc[0].account.creator.toString(),
+    //   totalTips: Number(acc[0].account.totalTips),
+    // };
+
+    const totalAccounts = [];
+
+    for (let i = 0; i < acc.length; i++) {
+      const tempAcc = {
+        pdaAddress: acc[i].publicKey.toString(),
+        creator: acc[i].account.creator.toString(),
+        totalTips: Number(acc[i].account.totalTips),
+      };
+
+      totalAccounts.push(tempAcc);
+    }
+
+    setVaultAccounts(totalAccounts);
+  }
+
+  // account
+  // :
+  // {creator: PublicKey, bump: 253, totalTips: BN}
+  // publicKey
+  // :
+  // PublicKey {_bn: BN}
+  useEffect(() => {
+    fetchAllAccounts();
+  }, [wallet]);
   return (
-    <div className=" bg-zinc-50 font-sans dark:bg-black py-6 px-12">
+    <div className=" bg-zinc-50 font-sans dark:bg-black py-7 px-12">
       {/* <main className="min-h-screen flex  w-full  flex-col items-start justify-between py-3 px-16  sm:items-start border    bg-red-400 font-sans"> */}
-      <main className="h-screen border-red-500 ">
+      <main className="h-full border-red-500 ">
         <Navbar />
 
         <HeroSection />
+
+        <div className="bg-zinc-50 h-full w-full">
+          <p>
+            Vaults Accounts({vaultAccounts.length}) :{" "}
+            {vaultAccounts[0]?.pdaAddress}
+          </p>
+          <h2 className="text-indigo-950">Latest Transactions:</h2>
+          <LatestTxns />
+        </div>
       </main>
     </div>
   );
