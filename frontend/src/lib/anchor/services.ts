@@ -1,4 +1,3 @@
-"use client";
 import {
   Connection,
   Keypair,
@@ -12,21 +11,8 @@ import { BN, Program, Wallet } from "@coral-xyz/anchor";
 import { AnchorProject } from "./anchor_project_idl";
 import idl from "./anchor_project_idl.json";
 import { getProgram } from "./program";
-// This error occurs if `@solana/wallet-adapter-react` (or its types) is not installed or is missing from your `node_modules`.
-// To fix it, run:
-//   npm install @solana/wallet-adapter-react
-//   npm install --save-dev @types/solana__wallet-adapter-react
-import {
-  AnchorWallet,
-  useAnchorWallet,
-  useWallet,
-} from "@solana/wallet-adapter-react";
 
-// const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-
-//   const program = new Program(idl as AnchorProject, {
-//     connection,
-//   });
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 
 export async function initializeVault(wallet: AnchorWallet, conn: Connection) {
   console.log("Initialize start : 1");
@@ -94,11 +80,6 @@ export async function getAllVaultAccount(
     throw new Error("Error initializing program");
   }
 
-  // const [creatorPda, _bump] = await PublicKey.findProgramAddressSync(
-  //   [Buffer.from("vault"), wallet.publicKey.toBuffer()],
-  //   new PublicKey(idl.address)
-  // );
-  // console.log("CreatorPda ,", creatorPda.toBase58());
   const vaultAccount = await program.account.vault.all();
 
   console.log("Vault Account", vaultAccount);
@@ -213,5 +194,79 @@ export const balOfVaultAccount = async (
     return lamp / 1000000000;
   } catch (error) {
     return 0;
+  }
+};
+
+function safePubkeyCheck(input: string) {
+  let actualPda: PublicKey;
+
+  try {
+    actualPda = new PublicKey(input);
+  } catch (err) {
+    console.log("Invalid public key format.");
+    return;
+  }
+
+  return actualPda;
+}
+
+export const checkCreatorVaultAccount = async (
+  pdaInput: string,
+  conn: Connection
+) => {
+  let accDetails: {
+    isExist: boolean;
+    pdaAcc: null | string;
+    message: string;
+  } = { isExist: false, message: "Not Found", pdaAcc: null };
+  try {
+    const actualPda = safePubkeyCheck(pdaInput);
+    if (!actualPda) {
+      accDetails.message = "Not Exist";
+
+      return accDetails;
+    }
+
+    const accountInfo = await conn.getAccountInfo(actualPda);
+
+    if (!accountInfo) {
+      console.log("This account does NOT exist on-chain.");
+      throw new Error("This account does NOT exist on-chain.");
+    }
+
+    if (accountInfo.owner.equals(new PublicKey(idl.address))) {
+      console.log("✅ This PDA is owned by the program.");
+      accDetails.isExist = true;
+      accDetails.message = "This account is owned by the program.";
+      accDetails.pdaAcc = actualPda.toString();
+    } else if (
+      accountInfo.owner.equals(
+        new PublicKey("11111111111111111111111111111111")
+      )
+    ) {
+      const [creatorVault, _] = PublicKey.findProgramAddressSync(
+        [Buffer.from("vault"), new PublicKey(pdaInput).toBuffer()],
+        new PublicKey(idl.address)
+      );
+      console.log("Creator vault Pda:", creatorVault.toString());
+
+      const accountInfo = await conn.getAccountInfo(creatorVault);
+
+      if (!accountInfo) {
+        console.log("This account does NOT exist on-chain.");
+        throw new Error("This account does NOT exist on-chain.");
+      } else {
+        console.log("✅ This PDA is owned by the program.");
+        accDetails.isExist = true;
+        accDetails.message = "This account is owned by the program.";
+        accDetails.pdaAcc = creatorVault.toString();
+      }
+    }
+
+    return accDetails;
+  } catch (error) {
+    console.log(error);
+
+    return accDetails;
   }
 };
