@@ -46,7 +46,7 @@ export function HeroSection({
 
         <p className="text-lg md:text-xl text-muted-foreground/90 max-w-2xl mx-auto text-balance leading-relaxed">
           {
-            "Empower creators with instant on-chain tips. Fast, transparent, and decentralized."
+            "Empower builders with instant on-chain tips. Fast, transparent, and decentralized."
           }
         </p>
 
