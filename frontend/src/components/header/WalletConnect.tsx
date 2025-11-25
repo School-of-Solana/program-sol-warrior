@@ -44,23 +44,25 @@ const ConnectWallet = () => {
 
 const connectedStyle = {
   background: "#ededed",
-  borderRadius: "2rem",
+  borderRadius: "1rem",
   maxWidth: "400px",
   color: "#000",
   // width: "10rem",
   fontSize: "1rem",
   height: "2.5rem",
   cursor: "pointer",
+  padding: "1.5rem 1rem",
 };
 const disconnectedStyle = {
   background: "#522AA5",
-  borderRadius: "2rem",
+  borderRadius: "1rem",
   maxWidth: "400px",
   // width: "10rem",
   color: "#fff",
   fontSize: "1rem",
   height: "2.5rem",
   cursor: "pointer",
+  padding: "1.5rem 1rem",
 };
 
 const BaseWalletMultiButtonDynamic = dynamic(
