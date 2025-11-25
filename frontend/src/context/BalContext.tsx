@@ -1,6 +1,12 @@
 "use client";
 import { useWallet } from "@solana/wallet-adapter-react";
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useState,
+  startTransition,
+} from "react";
 import { Connection } from "@solana/web3.js";
 
 const rpcURL =
@@ -25,9 +31,9 @@ export const BalanceProvider = ({
   const [walletBalance, setWalletBalance] = useState(0);
   const wallet = useWallet();
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!wallet.publicKey) {
-      setWalletBalance(0);
+      startTransition(() => setWalletBalance(0));
       return;
     }
     try {
@@ -40,17 +46,16 @@ export const BalanceProvider = ({
 
       const balanceSOL = balanceLamports / 1e9;
 
-      console.log({ balanceSOL });
-      setWalletBalance(balanceSOL);
+      startTransition(() => setWalletBalance(balanceSOL));
     } catch (error) {
       console.error("Fetching Wallet Bal Error:", error);
-      setWalletBalance(0);
+      startTransition(() => setWalletBalance(0));
     }
-  };
+  }, [wallet.publicKey]);
 
   useEffect(() => {
-    fetchBalance();
-  }, [wallet.connected]);
+    void fetchBalance();
+  }, [fetchBalance, wallet.connected]);
 
   return (
     <BalanceContext.Provider value={{ walletBalance, fetchBalance }}>

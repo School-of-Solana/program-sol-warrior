@@ -11,15 +11,7 @@ import {
 import { checkCreatorVaultAccount } from "@/src/lib/anchor/services";
 import { getConnection } from "@/src/lib/solana/connection";
 import React, { useState } from "react";
-import {
-  Search,
-  ArrowRight,
-  Sparkles,
-  Coins,
-  CheckCircle2,
-  XCircle,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowRight, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 
 const TipperPage = () => {
@@ -80,8 +72,8 @@ const TipperPage = () => {
                 You Love
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground/90 max-w-2xl mx-auto">
-                Search for a builder's wallet address or vault address to send
-                them a tip
+                Search for a builder&apos;s wallet address or vault address to
+                send them a tip
               </p>
             </div>
 

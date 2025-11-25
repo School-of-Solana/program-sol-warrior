@@ -1,10 +1,10 @@
-import { ExternalLink, TrendingUp } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Card } from "./ui/card";
 import Link from "next/link";
 import { getAllVaultAccount } from "../lib/anchor/services";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { getConnection } from "../lib/solana/connection";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, startTransition } from "react";
 
 export default function LatestTxns() {
   const wallet = useAnchorWallet();
@@ -14,10 +14,9 @@ export default function LatestTxns() {
     { pdaAddress: string; creator: string; totalTips: number }[]
   >([]);
 
-  async function fetchAllAccounts() {
+  const fetchAllAccounts = useCallback(async () => {
     if (!wallet) return;
     const acc = await getAllVaultAccount(wallet, conn);
-    console.log({ acc });
 
     const totalAccounts = acc
       .map((a) => ({
@@ -25,16 +24,15 @@ export default function LatestTxns() {
         creator: a.account.creator.toString(),
         totalTips: Number(a.account.totalTips / 1e9),
       }))
-      .slice(0, 10);
+      .slice(0, 10)
+      .sort((a, b) => b.totalTips - a.totalTips);
 
-    totalAccounts.sort((a, b) => b.totalTips - a.totalTips);
-
-    setVaultAccounts(totalAccounts);
-  }
+    startTransition(() => setVaultAccounts(totalAccounts));
+  }, [wallet, conn]);
 
   useEffect(() => {
-    fetchAllAccounts();
-  }, [wallet]);
+    void fetchAllAccounts();
+  }, [fetchAllAccounts]);
 
   return (
     <section className="mt-32 max-w-6xl mx-auto">
